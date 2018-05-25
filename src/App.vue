@@ -12,9 +12,6 @@ export default {
   name: 'app',
   components: {
     Navbar
-  },
-  mounted(){
-    this.Router.push("http://localhost:8080/catalog")
   }
 }
 </script>
