@@ -30,7 +30,7 @@
                                 <div class="col-lg-10">
                                     <form id="login-form" action="" method="post" role="form" v-if="state == 0">
                                         <div class="form-group">
-                                            <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Username" value="">
+                                            <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Email" value="">
                                         </div>
                                         <div class="form-group">
                                             <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
@@ -56,23 +56,41 @@
                                             </div>
                                         </div>
                                     </form>
-                                    <form id="register-form" action="" method="post" role="form" v-else>
+                                    
+                                    <form id="register-form" @submit="createAccount" action="/auth" method="post" role="form" v-else>
+                                        <div v-if="pass_not_match" class="alert alert-danger" role="alert">
+                                            Password not match!
+                                        </div>
+
+                                        <div v-if="reg_status === 1" class="alert alert-success" role="alert">
+                                            Account registered successfully!
+                                        </div>
+                                        <div v-else-if="reg_status === 2" class="alert alert-success" role="alert">
+                                            Registration failed!
+                                        </div>
+                                        <p v-if="errors.length">
+                                            <b>Please correct the following error(s):</b>
+                                            <ul>
+                                            <li v-for="error in errors">{{ error }}</li>
+                                            </ul>
+                                        </p>
+
                                         <div class="form-group">
-                                            <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Username" value="">
+                                            <input v-model="email" type="text" name="email" id="email" tabindex="1" class="form-control" placeholder="Email" value="">
                                         </div>
                                         <div class="form-group">
-                                            <input type="text" name="name" id="name" tabindex="1" class="form-control" placeholder="Name" value="">
+                                            <input v-model="name" type="text" name="name" id="name" tabindex="1" class="form-control" placeholder="Name" value="">
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+                                            <input v-model="password" type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" name="confirm-password" id="confirm-password" tabindex="2" class="form-control" placeholder="Confirm Password">
+                                            <input v-model="password2" type="password" name="confirm-password" id="confirm-password" tabindex="2" class="form-control" placeholder="Confirm Password">
                                         </div>
                                         <div class="form-group">
                                             <div class="row justify-content-center pb-5 pt-3">
                                                 <div class="col-sm-6 col-sm-offset-3">
-                                                    <input type="submit" name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now">
+                                                    <input type=submit name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now"></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -89,11 +107,87 @@
 </template>
 
 <script>
+import axios from 'axios'
+// import router from 'vue-router'
 export default {
     name: 'auth',
     data() {
         return{
-            state: 0
+            state: 0,
+            name: null,
+            email: null,
+            password: null,
+            password2: null,
+            pass_not_match: false,
+            reg_status: 0,
+            errors: []
+        }
+    },
+    methods: {
+        checkForm(e) {
+            this.errors = [];
+            if(!this.name) this.errors.push("Name required.");
+            if(!this.email) {
+                this.errors.push("Email required.");
+            } else if(!this.validEmail(this.email)) {
+                this.errors.push("Valid email required.");        
+            }
+            if(!this.password || !this.password2) this.errors.push("Password required.");
+            if(this.password !== this.password2) this.errors.push("Password not match.");
+            if(!this.errors.length) return true;
+            else return false;
+            e.preventDefault();
+        },
+
+        validEmail(email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        },
+
+        createAccount(e) {
+            this.checkForm(e);
+            if(!this.errors.length){
+                //http://192.168.119.176:3000/login
+                var root = 'http://192.168.137.133:3000';
+                var url = root + '/register';
+                var res_status = 200;
+                const self = this;
+
+                axios.post(url, {
+                    name: this.name,
+                    email: this.email,
+                    password: this.password,
+                })
+                .then(function (response) {
+                    console.log(response.status);
+                    
+                    if(response.status == '200'){
+                        console.log("tes")
+                        self.reg_status = 1;
+                        self.name = null;
+                        self.password = null;
+                        self.password2 = null;
+                        self.email = null;
+                        self.$router.push("/auth");
+                    }else{
+                        self.reg_status = 2;
+                        self.name = null;
+                        self.password = null;
+                        self.password2 = null;
+                        self.email = null;
+                        self.$router.push("/auth");
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });                         
+                
+            }
+            e.preventDefault();
+        },
+
+        login() {
+
         }
     }
 }

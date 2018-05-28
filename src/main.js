@@ -12,7 +12,7 @@ Vue.use(Router)
 Vue.config.productionTip = false
 
 const routes = [
-  { path: '/auth', component: Auth},
+  { path: '/auth', name: "auth", component: Auth},
   { path: '/catalog', component: Catalog, children: [
     { path: "", name: "catalog", component: Catalog}
   ]},
