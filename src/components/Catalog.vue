@@ -38,14 +38,14 @@ export default {
     data() {
         return {
             items: [],
-            root_url: 'http://192.168.119.176:3000/'            
+            root_url: this.$store.state.url_root            
         }
     },
     methods: {
         fetchItems() {
-            var root_url = 'http://192.168.119.176:3000/';
+            var root_url = this.$store.state.url_root;
 
-            fetch(root_url + 'books', {
+            fetch(root_url + '/books', {
                 method: 'GET',
             }).then((response) => {
                 return response.json();

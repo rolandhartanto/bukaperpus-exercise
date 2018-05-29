@@ -67,14 +67,14 @@ export default {
             id: this.$route.params.id,
             item: {},
             book_count: 0,
-            root_url: 'http://192.168.119.176:3000/'
+            root_url: this.$store.state.url_root
         }
     },
     methods: {
         fetchBookDetail() {
-            var root_url = 'http://192.168.119.176:3000/';
-            var url = root_url + 'books/' + this.id; 
-            var url_all_books = root_url + 'books/'; 
+            var root_url = this.$store.state.url_root;
+            var url = root_url + '/books/' + this.id; 
+            var url_all_books = root_url + '/books/'; 
 
             //perlu dioptimasi biar ga request terus
             fetch(url_all_books, {

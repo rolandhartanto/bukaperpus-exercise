@@ -148,7 +148,8 @@ export default {
             this.checkForm(e);
             if(!this.errors.length){
                 //http://192.168.119.176:3000/login
-                var root = 'http://192.168.137.133:3000';
+                var root = this.$store.state.url_root;
+                // var root = 'http://192.168.137.133:3000';
                 var url = root + '/register';
                 var res_status = 200;
                 const self = this;
