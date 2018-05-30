@@ -38,17 +38,17 @@ export default {
     data() {
         return {
             items: [],
-            root_url: this.$store.state.url_root            
+            root_url: this.$store.state.base.url_root            
         }
     },
     methods: {
         fetchItems() {
-            var root_url = this.$store.state.url_root;
+            var root_url = this.$store.state.base.url_root;
 
-            fetch(root_url + '/books', {
-                method: 'GET',
-            }).then((response) => {
-                return response.json();
+            axios.get(root_url + '/books')
+            .then((response) => {
+                console.log(response)
+                return response.data;
             }).then(json => this.items = json)
         }
     },

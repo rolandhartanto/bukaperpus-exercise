@@ -28,17 +28,14 @@
                         <div class="panel-body pt-3">
                             <div class="row justify-content-center">
                                 <div class="col-lg-10">
-                                    <form id="login-form" action="" method="post" role="form" v-if="state == 0">
+                                    <form id="login-form" @submit.prevent="login" method="post" role="form" v-if="state == 0">
                                         <div class="form-group">
-                                            <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Email" value="">
+                                            <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Email" value="" required v-model="login_email">
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+                                            <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password" required v-model="login_password">
                                         </div>
-                                        <div class="form-group text-center">
-                                            <input type="checkbox" tabindex="3" class="" name="remember" id="remember">
-                                            <label for="remember"> Remember Me</label>
-                                        </div>
+                                        
                                         <div class="form-group">
                                             <div class="row justify-content-center">
                                                 <div class="col-sm-6 col-sm-offset-3">
@@ -90,7 +87,7 @@
                                         <div class="form-group">
                                             <div class="row justify-content-center pb-5 pt-3">
                                                 <div class="col-sm-6 col-sm-offset-3">
-                                                    <input type=submit name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now"></button>
+                                                    <input type=submit name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now"></input>
                                                 </div>
                                             </div>
                                         </div>
@@ -120,7 +117,9 @@ export default {
             password2: null,
             pass_not_match: false,
             reg_status: 0,
-            errors: []
+            errors: [],
+            login_email: null,
+            login_password: null
         }
     },
     methods: {
@@ -148,7 +147,7 @@ export default {
             this.checkForm(e);
             if(!this.errors.length){
                 //http://192.168.119.176:3000/login
-                var root = this.$store.state.url_root;
+                var root = this.$store.state.base.url_root;
                 // var root = 'http://192.168.137.133:3000';
                 var url = root + '/register';
                 var res_status = 200;
@@ -159,7 +158,7 @@ export default {
                     email: this.email,
                     password: this.password,
                 })
-                .then(function (response) {
+                .then((response) => {
                     console.log(response.status);
                     
                     if(response.status == '200'){
@@ -179,7 +178,7 @@ export default {
                         self.$router.push("/auth");
                     }
                 })
-                .catch(function (error) {
+                .catch((error) => {
                     console.log(error);
                 });                         
                 
@@ -188,7 +187,11 @@ export default {
         },
 
         login() {
-
+            var email = this.login_email
+            var password = this.login_password
+            this.$store.dispatch('AUTH_REQUEST', {email, password}).then(() => {
+                this.$router.push('/')
+            })
         }
     }
 }

@@ -67,12 +67,12 @@ export default {
             id: this.$route.params.id,
             item: {},
             book_count: 0,
-            root_url: this.$store.state.url_root
+            root_url: this.$store.state.base.url_root
         }
     },
     methods: {
         fetchBookDetail() {
-            var root_url = this.$store.state.url_root;
+            var root_url = this.$store.state.base.url_root;
             var url = root_url + '/books/' + this.id; 
             var url_all_books = root_url + '/books/'; 
 
