@@ -2,7 +2,7 @@
     <div id="catalog">
         <div class="container page-content">
             <h2 class="mt-5">Books</h2>
-            <div class="row justify-content-center">
+            <!--div class="row justify-content-center">
                 <div class="col-lg-6 mt-4">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search Book ...">
@@ -11,7 +11,7 @@
                         </span>
                     </div>
                 </div>
-            </div>
+            </div-->
 
             <div class="container row mt-5">
                 <div v-for="item in items" class="card" style="width: 220px;">

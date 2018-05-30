@@ -9,7 +9,12 @@ import Vuex from 'vuex'
 import 'es6-promise/auto'
 import axios from 'axios'
 
-// import Register from './components/Register.vue'
+const moment = require('moment')
+require('moment/locale/es')
+Vue.use(require('vue-moment'), {
+  moment
+})
+moment.locale('en')
 
 Vue.use(Router)
 Vue.use(Vuex)
