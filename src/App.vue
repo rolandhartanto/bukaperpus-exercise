@@ -1,13 +1,12 @@
 <template>
   <div id="app">
     <Navbar />
-    <router-view></router-view>
+    <router-view :key="$route.path"></router-view>
   </div>
 </template>
 
 <script>
 import Navbar from './components/Navbar.vue'
-import Router from 'vue-router'
 import axios from 'axios'
 
 export default {
