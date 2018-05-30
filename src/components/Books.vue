@@ -21,9 +21,9 @@
                             <td><img class="little-cover" :src="root_url + item.cover" /></td>
                             <td>{{item.title}}</td>
                             <td>{{item.author}}</td>
-                            <td class="date">{{item.borrowed_at}}</td>
-                            <td class="date">{{item.expired_at}}</td>
-                            <td><button v-on:click="returnBook(item.id)" class="btn btn-return">Return Book</button></td>
+                            <td :id="'datetime_b' + index">{{item.borrowed_at}}</td>
+                            <td :id="'datetime_r' + index">{{item.expired_at}}</td>
+                            <td><button v-on:click="returnBook(item.borrow_id)" class="btn btn-return">Return Book</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -50,15 +50,27 @@ export default {
                 return response.data
             }).then(json => this.items = json)
         },
-        formatDate() {
-            
-        },
         returnBook(id) {
             console.log(id)
             var self = this
-            axios.get(this.root_url + '/books/' + id + "/return").then(response => {
+            axios.post(this.root_url + '/books/return', {
+                borrow_id: id,
+            }).then(response => {
                 self.fetchItems()
             })
+        },
+        formatDate(){
+            for(var i = 0; i < this.items.length; i++){
+                var date_borrow = document.getElementById("datetime_b" + i).innerHTML
+                var date_return = document.getElementById("datetime_r" + i).innerHTML
+
+                var formatted = new Date(date_borrow)
+                document.getElementById("datetime_b" + i).innerHTML = formatted
+                console.log(formatted)
+                formatted = new Date(date_return)
+                document.getElementById("datetime_b" + i).innerHTML = formatted
+                console.log(formatted)
+            }
         }
     },
     created(){
