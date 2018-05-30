@@ -8,21 +8,21 @@
                         <img class="detail-picture" :src="root_url + item.cover"/>
                     </div>
                     <div>
-                        <a href="" class="btn btn-primary mt-3 btn-block">+ Add to Borrow List</a>
+                        <button v-on:click="borrowBook" class="btn btn-primary mt-3 btn-block">+ Add to Borrow List</button>
                         <div class="row ml-0 mt-3">
                             
                             <div v-if="(parseInt(id.toString())-1) >= 1">
-                                <a :href="'/detail/'+ (parseInt(id.toString())-1)" class="btn btn-back"> < Prev</a>
+                                <a :href="'/detail/'+ (parseInt(id.toString())-1)" class="btn btn-back"> &lt; Prev</a>
                             </div>
                             <div v-else>
-                                <a :href="'/detail/' + book_count" class="btn btn-back"> < Prev</a>
+                                <a :href="'/detail/' + book_count" class="btn btn-back"> &lt; Prev</a>
                             </div>
 
                             <div class="ml-2" v-if="(parseInt(id.toString())+1) <= book_count">
-                                <a :href="'/detail/' + (parseInt(id.toString())+1)" class="btn btn-back"> Next ></a>
+                                <a :href="'/detail/' + (parseInt(id.toString())+1)" class="btn btn-back"> Next &gt;</a>
                             </div>
                             <div class="ml-2" v-else>
-                                <a href="/detail/1" class="btn btn-back"> Next ></a>
+                                <a href="/detail/1" class="btn btn-back"> Next &gt;</a>
                             </div>
                         </div>
                     </div>
@@ -61,6 +61,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
     data() {
         return {
@@ -77,17 +78,22 @@ export default {
             var url_all_books = root_url + '/books/'; 
 
             //perlu dioptimasi biar ga request terus
-            fetch(url_all_books, {
-                method: 'GET',
-            }).then((response) => {
-                return response.json();
+            axios(url_all_books).then((response) => {
+                return response.data;
             }).then(json => this.book_count = json.length);
 
-            fetch(url, {
-                method: 'GET',
-            }).then((response) => {
-                return response.json();
+            axios(url).then((response) => {
+                return response.data;
             }).then(json => this.item = json);
+        },
+        borrowBook() {
+            var root_url = this.$store.state.base.url_root;
+            var url = root_url + '/books/' + this.id + '/borrow'
+            var self = this
+
+            axios(url).then((response) => {
+                this.fetchBookDetail()
+            })
         }
     },
     created() {
