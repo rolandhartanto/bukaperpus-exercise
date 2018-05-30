@@ -95,7 +95,6 @@ const store = new Vuex.Store({
 })
 
 const ifAuthenticated = (to, from, next) => {
-  var authenticated = false
   if(store.getters.is_authenticated){
     axios.get(store.state.base.url_root + '/auth').then((response) => {
       // console.log(response.data.message)
