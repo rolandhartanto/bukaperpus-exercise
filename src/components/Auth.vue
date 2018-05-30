@@ -87,7 +87,7 @@
                                         <div class="form-group">
                                             <div class="row justify-content-center pb-5 pt-3">
                                                 <div class="col-sm-6 col-sm-offset-3">
-                                                    <input type=submit name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now"></input>
+                                                    <input type=submit name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now">
                                                 </div>
                                             </div>
                                         </div>
@@ -123,7 +123,7 @@ export default {
         }
     },
     methods: {
-        checkForm(e) {
+        checkForm() {
             this.errors = [];
             if(!this.name) this.errors.push("Name required.");
             if(!this.email) {
@@ -135,7 +135,7 @@ export default {
             if(this.password !== this.password2) this.errors.push("Password not match.");
             if(!this.errors.length) return true;
             else return false;
-            e.preventDefault();
+            // e.preventDefault();
         },
 
         validEmail(email) {
@@ -144,13 +144,11 @@ export default {
         },
 
         createAccount(e) {
-            this.checkForm(e);
+            this.checkForm();
             if(!this.errors.length){
-                //http://192.168.119.176:3000/login
                 var root = this.$store.state.base.url_root;
-                // var root = 'http://192.168.137.133:3000';
                 var url = root + '/register';
-                var res_status = 200;
+                
                 const self = this;
 
                 axios.post(url, {
@@ -159,24 +157,16 @@ export default {
                     password: this.password,
                 })
                 .then((response) => {
-                    console.log(response.status);
-                    
                     if(response.status == '200'){
-                        console.log("tes")
                         self.reg_status = 1;
-                        self.name = null;
-                        self.password = null;
-                        self.password2 = null;
-                        self.email = null;
-                        self.$router.push("/auth");
                     }else{
                         self.reg_status = 2;
-                        self.name = null;
-                        self.password = null;
-                        self.password2 = null;
-                        self.email = null;
-                        self.$router.push("/auth");
                     }
+                    self.name = null;
+                    self.password = null;
+                    self.password2 = null;
+                    self.email = null;
+                    self.$router.push("/auth");
                 })
                 .catch((error) => {
                     console.log(error);

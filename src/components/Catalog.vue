@@ -43,11 +43,8 @@ export default {
     },
     methods: {
         fetchItems() {
-            var root_url = this.$store.state.base.url_root;
-
-            axios.get(root_url + '/books')
+            axios.get(this.root_url + '/books')
             .then((response) => {
-                console.log(response)
                 return response.data;
             }).then(json => this.items = json)
         }
