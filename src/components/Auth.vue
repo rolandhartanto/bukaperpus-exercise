@@ -28,17 +28,14 @@
                         <div class="panel-body pt-3">
                             <div class="row justify-content-center">
                                 <div class="col-lg-10">
-                                    <form id="login-form" action="" method="post" role="form" v-if="state == 0">
+                                    <form id="login-form" @submit.prevent="login" method="post" role="form" v-if="state == 0">
                                         <div class="form-group">
-                                            <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Username" value="">
+                                            <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Email" value="" required v-model="login_email">
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+                                            <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password" required v-model="login_password">
                                         </div>
-                                        <div class="form-group text-center">
-                                            <input type="checkbox" tabindex="3" class="" name="remember" id="remember">
-                                            <label for="remember"> Remember Me</label>
-                                        </div>
+                                        
                                         <div class="form-group">
                                             <div class="row justify-content-center">
                                                 <div class="col-sm-6 col-sm-offset-3">
@@ -56,23 +53,41 @@
                                             </div>
                                         </div>
                                     </form>
-                                    <form id="register-form" action="" method="post" role="form" v-else>
+                                    
+                                    <form id="register-form" @submit="createAccount" action="/auth" method="post" role="form" v-else>
+                                        <div v-if="pass_not_match" class="alert alert-danger" role="alert">
+                                            Password not match!
+                                        </div>
+
+                                        <div v-if="reg_status === 1" class="alert alert-success" role="alert">
+                                            Account registered successfully!
+                                        </div>
+                                        <div v-else-if="reg_status === 2" class="alert alert-success" role="alert">
+                                            Registration failed!
+                                        </div>
+                                        <p v-if="errors.length">
+                                            <b>Please correct the following error(s):</b>
+                                            <ul>
+                                            <li v-for="error in errors">{{ error }}</li>
+                                            </ul>
+                                        </p>
+
                                         <div class="form-group">
-                                            <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Username" value="">
+                                            <input v-model="email" type="text" name="email" id="email" tabindex="1" class="form-control" placeholder="Email" value="">
                                         </div>
                                         <div class="form-group">
-                                            <input type="text" name="name" id="name" tabindex="1" class="form-control" placeholder="Name" value="">
+                                            <input v-model="name" type="text" name="name" id="name" tabindex="1" class="form-control" placeholder="Name" value="">
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+                                            <input v-model="password" type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" name="confirm-password" id="confirm-password" tabindex="2" class="form-control" placeholder="Confirm Password">
+                                            <input v-model="password2" type="password" name="confirm-password" id="confirm-password" tabindex="2" class="form-control" placeholder="Confirm Password">
                                         </div>
                                         <div class="form-group">
                                             <div class="row justify-content-center pb-5 pt-3">
                                                 <div class="col-sm-6 col-sm-offset-3">
-                                                    <input type="submit" name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now">
+                                                    <input type=submit name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now">
                                                 </div>
                                             </div>
                                         </div>
@@ -89,11 +104,84 @@
 </template>
 
 <script>
+import axios from 'axios'
+// import router from 'vue-router'
 export default {
     name: 'auth',
     data() {
         return{
-            state: 0
+            state: 0,
+            name: null,
+            email: null,
+            password: null,
+            password2: null,
+            pass_not_match: false,
+            reg_status: 0,
+            errors: [],
+            login_email: null,
+            login_password: null
+        }
+    },
+    methods: {
+        checkForm() {
+            this.errors = [];
+            if(!this.name) this.errors.push("Name required.");
+            if(!this.email) {
+                this.errors.push("Email required.");
+            } else if(!this.validEmail(this.email)) {
+                this.errors.push("Valid email required.");        
+            }
+            if(!this.password || !this.password2) this.errors.push("Password required.");
+            if(this.password !== this.password2) this.errors.push("Password not match.");
+            if(!this.errors.length) return true;
+            else return false;
+            // e.preventDefault();
+        },
+
+        validEmail(email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        },
+
+        createAccount(e) {
+            this.checkForm();
+            if(!this.errors.length){
+                var root = this.$store.state.base.url_root;
+                var url = root + '/register';
+                
+                const self = this;
+
+                axios.post(url, {
+                    name: this.name,
+                    email: this.email,
+                    password: this.password,
+                })
+                .then((response) => {
+                    if(response.status == '200'){
+                        self.reg_status = 1;
+                    }else{
+                        self.reg_status = 2;
+                    }
+                    self.name = null;
+                    self.password = null;
+                    self.password2 = null;
+                    self.email = null;
+                    self.$router.push("/auth");
+                })
+                .catch((error) => {
+                    console.log(error);
+                });                         
+                
+            }
+            e.preventDefault();
+        },
+
+        login() {
+            var email = this.login_email
+            var password = this.login_password
+            this.$store.dispatch('AUTH_REQUEST', {email, password}).then(() => {
+                this.$router.push('/')
+            })
         }
     }
 }
